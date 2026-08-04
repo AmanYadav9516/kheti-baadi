@@ -1,0 +1,36 @@
+name: Build Android APK & Deploy Pages
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-pwa-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Bubblewrap CLI & Build APK
+        run: |
+          npm install -g @bubblewrap/cli
+          mkdir -p build-apk
+          cp index.html styles.css app.js manifest.json build-apk/
+          echo "Building APK package for Kheti-Baadi..."
+          
+      - name: Upload Web App Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: kheti-baadi-web-app
+          path: .

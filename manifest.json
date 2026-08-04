@@ -1,0 +1,21 @@
+{
+  "short_name": "खेती-बाड़ी",
+  "name": "Kheti-Baadi - Farmer Assistant",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/6202/6202843.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/6202/6202843.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0f392b",
+  "theme_color": "#1b4332",
+  "display": "standalone",
+  "orientation": "portrait"
+}

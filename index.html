@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>खेती-बाड़ी (Kheti-Baadi) - भारतीय किसान ऐप</title>
+  
+  <!-- Google Fonts: Outfit & Noto Sans Devanagari -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 Pro Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- App Stylesheet & PWA Manifest -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1b4332">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       1. GLASSMORPHISM LOGIN PAGE (Matching User Reference Image)
+       ========================================================================== -->
+  <div id="loginView" class="login-page">
+    <div class="login-glass-card">
+      
+      <!-- Language Switcher in Login -->
+      <div class="lang-toggle-bar">
+        <button type="button" class="lang-btn active" onclick="setLanguage('hi')">🇮🇳 हिंदी</button>
+        <button type="button" class="lang-btn" onclick="setLanguage('en')">🇬🇧 English</button>
+      </div>
+
+      <div class="login-header">
+        <div class="login-brand-tag">
+          <i class="fa-solid fa-wheat-awn"></i> <span data-i18n="appName">Kheti-Baadi</span>
+        </div>
+        <h1 data-i18n="loginTitle">Login</h1>
+        <p data-i18n="loginSubtitle">Welcome back please login to your account</p>
+      </div>
+
+      <form id="loginForm" class="login-form" onsubmit="handleLogin(event)">
+        <!-- Username / Phone Input -->
+        <div class="input-field-group">
+          <input type="text" id="loginUsername" placeholder="User Name / किसान का नाम" required value="रमेश चौधरी">
+          <i class="fa-regular fa-user input-icon"></i>
+        </div>
+
+        <!-- Password Input -->
+        <div class="input-field-group">
+          <input type="password" id="loginPassword" placeholder="Password / पासवर्ड" required value="farmer123">
+          <i class="fa-regular fa-eye-slash input-icon" id="togglePassIcon" onclick="togglePasswordVisibility()"></i>
+        </div>
+
+        <!-- Remember Me Checkbox -->
+        <div class="form-options">
+          <label class="remember-checkbox">
+            <input type="checkbox" id="rememberMe" checked>
+            <span class="custom-checkmark"><i class="fa-solid fa-check" style="font-size: 0.75rem;"></i></span>
+            <span data-i18n="rememberMe">Remember me</span>
+          </label>
+          <a style="color: rgba(255,255,255,0.85); font-size: 0.85rem; text-decoration: none;" href="#" onclick="alert('हेल्पलाइन नंबर: 1800-180-1551 (किसान कॉल सेंटर)'); return false;">पासवर्ड भूल गए?</a>
+        </div>
+
+        <!-- Gradient Login Button -->
+        <button type="submit" class="btn-login-gradient">
+          <span data-i18n="loginBtn">Login</span> <i class="fa-solid fa-arrow-right-long"></i>
+        </button>
+
+        <!-- Quick Farmer Demo Access -->
+        <button type="button" class="btn-demo-quick" onclick="quickDemoLogin()">
+          <i class="fa-solid fa-tractor"></i> <span>किसान त्वरित प्रवेश (Demo Login)</span>
+        </button>
+
+        <div class="login-footer-links">
+          <span data-i18n="noAccount">Don't have an account?</span> <a onclick="quickDemoLogin()" data-i18n="signup">Signup</a>
+        </div>
+
+        <div class="login-copyright">
+          Created for Indian Farmers | भारतीय किसान स्पेशल 🌾
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       2. MAIN APP DASHBOARD VIEW (Visible after Login)
+       ========================================================================== -->
+  <div id="appView" class="app-wrapper hidden-panel">
+    
+    <!-- Top Sticky Header Navbar -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo-icon">
+          <i class="fa-solid fa-wheat-awn"></i>
+        </div>
+        <div class="brand-title-group">
+          <h2>खेती-बाड़ी</h2>
+          <span>Kheti-Baadi Farmer Assistant</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <!-- Multi-Farm Selector Dropdown -->
+        <div class="farm-selector-pill">
+          <i class="fa-solid fa-location-dot text-gold"></i>
+          <select id="activeFarmSelect" onchange="changeActiveFarm(this.value)">
+            <option value="farm1">🌾 खेत 1: गेहूं (3 एकड़, कोटा)</option>
+            <option value="farm2">🌿 खेत 2: सरसों (2 एकड़, बारां)</option>
+            <option value="farm3">🌱 खेत 3: चना (1.5 एकड़, बूंदी)</option>
+          </select>
+        </div>
+
+        <!-- Weather Quick Badge -->
+        <div class="weather-badge-pill" id="headerWeatherBadge">
+          <i class="fa-solid fa-cloud-sun-rain"></i>
+          <span>28°C | कोटा (वर्षा संभव)</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Language Switcher -->
+        <div class="lang-toggle-bar" style="margin-bottom: 0;">
+          <button type="button" class="lang-btn active" id="btnLangHi" onclick="setLanguage('hi')">हिंदी</button>
+          <button type="button" class="lang-btn" id="btnLangEn" onclick="setLanguage('en')">English</button>
+        </div>
+
+        <!-- User Profile Pill & Logout -->
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="userAvatarChar">र</div>
+          <span style="font-size: 0.9rem; font-weight: 600;" id="displayUserName">रमेश जी</span>
+        </div>
+        <button class="btn-logout-icon" title="लॉगआउट करें" onclick="handleLogout()">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs Bar -->
+    <nav class="nav-tabs-bar">
+      <div class="tab-item active" onclick="switchTab('dashboard', this)">
+        <i class="fa-solid fa-house"></i> <span>डैशबोर्ड</span>
+      </div>
+      <div class="tab-item" onclick="switchTab('weather', this)">
+        <i class="fa-solid fa-cloud-bolt"></i> <span>मौसम ज्ञान</span>
+      </div>
+      <div class="tab-item" onclick="switchTab('calendar', this)">
+        <i class="fa-solid fa-calendar-days"></i> <span>फसल कैलेंडर</span>
+      </div>
+      <div class="tab-item" onclick="switchTab('disease', this)">
+        <i class="fa-solid fa-disease"></i> <span>फसल डॉक्टर (AI)</span>
+      </div>
+      <div class="tab-item" onclick="switchTab('diary', this)">
+        <i class="fa-solid fa-book-journal-whills"></i> <span>खेत खाता</span>
+      </div>
+      <div class="tab-item" onclick="switchTab('mandi', this)">
+        <i class="fa-solid fa-chart-line"></i> <span>मंडी भाव</span>
+      </div>
+      <div class="tab-item" onclick="switchTab('reminders', this)">
+        <i class="fa-solid fa-bell"></i> <span>रिमाइंडर्स</span>
+      </div>
+      <div class="tab-item" onclick="switchTab('schemes', this)">
+        <i class="fa-solid fa-hand-holding-hand"></i> <span>सरकारी योजनाएं</span>
+      </div>
+    </nav>
+
+    <!-- Main Container Content -->
+    <main class="main-content">
+      
+      <!-- HERO SMART RISK ALERT BANNER -->
+      <section class="hero-risk-banner">
+        <div class="risk-alert-top">
+          <span class="alert-badge-red">
+            <i class="fa-solid fa-triangle-exclamation"></i> 🚨 48h मौसम जोखिम चेतावनी
+          </span>
+          <span class="alert-timestamp"><i class="fa-regular fa-clock"></i> अपडेट: आज दोपहर 01:15 बजे</span>
+        </div>
+        <div class="risk-banner-content">
+          <h2>आज शाम तेज हवा व बारिश की संभावना (40 km/h)</h2>
+          <p id="riskAlertText">
+            अगले 48 घंटे में भारी बारिश की संभावना है। <strong>आज यूरिया खाद मत डालें</strong> और <strong>कीटनाशक का छिड़काव रोक दें।</strong> कल सुबह मौसम साफ होने पर स्प्रे करना सही रहेगा।
+          </p>
+        </div>
+        <div class="risk-banner-actions">
+          <!-- Voice Announcement Trigger Button -->
+          <button class="btn-voice-announce" onclick="speakWeatherAlert()">
+            <i class="fa-solid fa-volume-high"></i> <span>🔊 मौसम अलर्ट सुनें (Voice Alert)</span>
+          </button>
+          
+          <div class="weather-stats-pills">
+            <div class="stat-pill"><i class="fa-solid fa-droplet"></i> वर्षा: 85%</div>
+            <div class="stat-pill"><i class="fa-solid fa-wind"></i> हवा: 38 km/h</div>
+            <div class="stat-pill"><i class="fa-solid fa-temperature-three-quarters"></i> ताप: 28°C</div>
+            <div class="stat-pill"><i class="fa-solid fa-shield-halved"></i> फसल: गेहूं (45 दिन)</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 1: DASHBOARD OVERVIEW -->
+      <div id="panel-dashboard" class="tab-panel">
+        
+        <!-- 4-Metric Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-info">
+              <h4>आज का मौसम</h4>
+              <div class="metric-value">28°C</div>
+              <div class="metric-subtext">कोटा • वर्षा की संभावना</div>
+            </div>
+            <div class="metric-icon-box bg-blue-light">
+              <i class="fa-solid fa-cloud-showers-heavy"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-info">
+              <h4>आज के काम</h4>
+              <div class="metric-value">3 कार्य</div>
+              <div class="metric-subtext">सिंचाई • खाद जाँच</div>
+            </div>
+            <div class="metric-icon-box bg-amber-light">
+              <i class="fa-solid fa-list-check"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-info">
+              <h4>अगली सिंचाई</h4>
+              <div class="metric-value">2 दिन बाद</div>
+              <div class="metric-subtext">गेहूं - दूसरी सिंचाई (CRI)</div>
+            </div>
+            <div class="metric-icon-box bg-green-light">
+              <i class="fa-solid fa-faucet-drip"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-info">
+              <h4>गेहूं मंडी भाव</h4>
+              <div class="metric-value">₹2,450</div>
+              <div class="metric-subtext">प्रति क्विंटल • 📈 +₹40 तेज</div>
+            </div>
+            <div class="metric-icon-box bg-purple-light">
+              <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-columns">
+          
+          <!-- Left Main Column -->
+          <div class="left-col">
+            <!-- Quick Actions Grid -->
+            <div class="card-panel">
+              <div class="card-panel-header">
+                <h3><i class="fa-solid fa-bolt"></i> त्वरित सेवा (Quick Services)</h3>
+              </div>
+              <div class="quick-actions-grid">
+                <div class="action-tile" onclick="switchTab('disease')">
+                  <div class="action-tile-icon"><i class="fa-solid fa-camera"></i></div>
+                  <span>फसल डॉक्टर</span>
+                </div>
+                <div class="action-tile" onclick="switchTab('calendar')">
+                  <div class="action-tile-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                  <span>फसल कैलेंडर</span>
+                </div>
+                <div class="action-tile" onclick="switchTab('mandi')">
+                  <div class="action-tile-icon"><i class="fa-solid fa-store"></i></div>
+                  <span>मंडी भाव</span>
+                </div>
+                <div class="action-tile" onclick="switchTab('diary')">
+                  <div class="action-tile-icon"><i class="fa-solid fa-calculator"></i></div>
+                  <span>खेत बही-खाता</span>
+                </div>
+                <div class="action-tile" onclick="switchTab('reminders')">
+                  <div class="action-tile-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                  <span>सिंचाई टाइमर</span>
+                </div>
+                <div class="action-tile" onclick="switchTab('schemes')">
+                  <div class="action-tile-icon"><i class="fa-solid fa-landmark"></i></div>
+                  <span>सरकारी योजनाएं</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Today's Farm Tasks Timeline -->
+            <div class="card-panel">
+              <div class="card-panel-header">
+                <h3><i class="fa-solid fa-calendar-check"></i> आज के कृषि कार्य (Today's Tasks)</h3>
+                <span class="task-tag">3 कार्य पेंडिंग</span>
+              </div>
+              <div class="task-timeline">
+                <div class="task-item">
+                  <div class="task-item-left">
+                    <input type="checkbox" onchange="toggleTaskDone(this)">
+                    <div>
+                      <div class="task-title">💧 नहर सिंचाई जाँच (खेत 1)</div>
+                      <div class="task-desc">गेहूं की ताज जड़ (CRI) अवस्था के लिए पानी की जाँच।</div>
+                    </div>
+                  </div>
+                  <span class="task-tag">सुबह 08:00</span>
+                </div>
+
+                <div class="task-item">
+                  <div class="task-item-left">
+                    <input type="checkbox" onchange="toggleTaskDone(this)">
+                    <div>
+                      <div class="task-title">⚠️ यूरिया छिड़काव स्थगित (Postponed)</div>
+                      <div class="task-desc">बारिश की संभावना के कारण आज यूरिया न डालें।</div>
+                    </div>
+                  </div>
+                  <span class="task-tag" style="background:#fee2e2; color:#b91c1c;">अलर्ट</span>
+                </div>
+
+                <div class="task-item">
+                  <div class="task-item-left">
+                    <input type="checkbox" onchange="toggleTaskDone(this)">
+                    <div>
+                      <div class="task-title">📝 बही-खाता में डीजल खर्च जोड़ें</div>
+                      <div class="task-desc">कल के ट्रैक्टर जुताई का ₹1,200 दर्ज करें।</div>
+                    </div>
+                  </div>
+                  <span class="task-tag">शाम 06:00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Sidebar Column -->
+          <div class="right-col">
+            
+            <!-- Mandi Prices Widget -->
+            <div class="card-panel">
+              <div class="card-panel-header">
+                <h3><i class="fa-solid fa-coins"></i> पास की मंडी भाव</h3>
+                <a onclick="switchTab('mandi')" style="font-size:0.8rem; font-weight:700; color:var(--primary-leaf); cursor:pointer;">सभी देखें &rarr;</a>
+              </div>
+              <div class="mandi-table-wrapper">
+                <table class="mandi-table">
+                  <thead>
+                    <tr>
+                      <th>फसल</th>
+                      <th>मंडी</th>
+                      <th>भाव (₹/क्वि)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>🌾 गेहूं</td>
+                      <td>कोटा (Kota)</td>
+                      <td class="price-up">₹2,450 📈</td>
+                    </tr>
+                    <tr>
+                      <td>🌿 सरसों</td>
+                      <td>बारां (Baran)</td>
+                      <td class="price-up">₹5,820 📈</td>
+                    </tr>
+                    <tr>
+                      <td>🌱 चना</td>
+                      <td>बूंदी (Bundi)</td>
+                      <td class="price-down">₹4,950 📉</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Farm Diary Quick Summary Widget -->
+            <div class="card-panel">
+              <div class="card-panel-header">
+                <h3><i class="fa-solid fa-wallet"></i> इस सीजन का कुल खर्च</h3>
+              </div>
+              <div style="text-align: center; padding: 10px 0;">
+                <div style="font-size: 0.85rem; color: var(--text-muted);">गेहूं (Farm 1) कुल खर्च:</div>
+                <div style="font-size: 2rem; font-weight: 800; color: var(--alert-red);">₹14,500</div>
+                <div style="font-size: 0.85rem; color: var(--primary-leaf); margin-top: 4px;">अनुमानित आय: ₹65,000 (लाभ: +₹50,500)</div>
+              </div>
+              <button class="btn-primary-green" style="width: 100%; margin-top: 10px;" onclick="switchTab('diary')">
+                + नया खर्च दर्ज करें
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: WEATHER AI & RISK ENGINE -->
+      <div id="panel-weather" class="tab-panel hidden-panel">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h3><i class="fa-solid fa-cloud-bolt"></i> मौसम ज्ञान एवं 48 घंटे का AI पूर्वानुमान</h3>
+            <button class="btn-primary-green" onclick="fetchLiveWeather()"><i class="fa-solid fa-rotate"></i> ताज़ा करें</button>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+            <div style="background:#f0fdf4; border:1px solid #b7e4c7; padding:20px; border-radius:16px; text-align:center;">
+              <i class="fa-solid fa-sun text-gold" style="font-size:3.5rem;"></i>
+              <h2 style="font-size:2.5rem; font-weight:800; color:var(--primary-deep); margin:10px 0 0;">28°C</h2>
+              <p style="font-size:1.1rem; font-weight:700; color:var(--primary-mid);">कोटा, राजस्थान</p>
+              <p style="font-size:0.85rem; color:var(--text-muted);">आंशिक बादल • हवा: 18 km/h • नमी: 72%</p>
+            </div>
+            <div>
+              <h4 style="margin-bottom:12px; font-weight:700;">🤖 AI मौसम सलाह (Agricultural Recommendations):</h4>
+              <ul style="line-height:1.8; color:var(--text-main); font-size:0.95rem; padding-left:20px;">
+                <li>🌧️ <strong>बारिश अलर्ट:</strong> अगले 24 घंटे में मध्यम से भारी बारिश की संभावना है।</li>
+                <li>🧪 <strong>उर्वरक सलाह:</strong> आज यूरिया डालने से बचें, पानी के साथ बहने का खतरा है।</li>
+                <li>💨 <strong>कीटनाशक सलाह:</strong> हवा की गति 38 km/h रहने से स्प्रे का असर कम होगा। कल सुबह स्प्रे करें।</li>
+                <li>💧 <strong>सिंचाई सलाह:</strong> बारिश के कारण अगली सिंचाई 3 दिन के लिए टाल दी गई है।</li>
+              </ul>
+            </div>
+          </div>
+
+          <h4 style="margin-top:28px; margin-bottom:14px;">📅 अगले 7 दिनों का मौसम पूर्वानुमान (7-Day Forecast):</h4>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:12px;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; text-align:center;">
+              <div style="font-size:0.8rem; font-weight:700;">आज (मंगल)</div>
+              <i class="fa-solid fa-cloud-showers-heavy" style="font-size:1.5rem; color:#0284c7; margin:8px 0;"></i>
+              <div style="font-size:0.9rem; font-weight:800;">28°C</div>
+              <div style="font-size:0.75rem; color:#dc2626;">85% बारिश</div>
+            </div>
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; text-align:center;">
+              <div style="font-size:0.8rem; font-weight:700;">बुधवार</div>
+              <i class="fa-solid fa-cloud-sun" style="font-size:1.5rem; color:#d97706; margin:8px 0;"></i>
+              <div style="font-size:0.9rem; font-weight:800;">30°C</div>
+              <div style="font-size:0.75rem; color:#16a34a;">20% बारिश</div>
+            </div>
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; text-align:center;">
+              <div style="font-size:0.8rem; font-weight:700;">गुरुवार</div>
+              <i class="fa-solid fa-sun" style="font-size:1.5rem; color:#eab308; margin:8px 0;"></i>
+              <div style="font-size:0.9rem; font-weight:800;">32°C</div>
+              <div style="font-size:0.75rem; color:#16a34a;">0% बारिश</div>
+            </div>
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; text-align:center;">
+              <div style="font-size:0.8rem; font-weight:700;">शुक्रवार</div>
+              <i class="fa-solid fa-sun" style="font-size:1.5rem; color:#eab308; margin:8px 0;"></i>
+              <div style="font-size:0.9rem; font-weight:800;">33°C</div>
+              <div style="font-size:0.75rem; color:#16a34a;">0% बारिश</div>
+            </div>
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; text-align:center;">
+              <div style="font-size:0.8rem; font-weight:700;">शनिवार</div>
+              <i class="fa-solid fa-cloud-bolt" style="font-size:1.5rem; color:#7c3aed; margin:8px 0;"></i>
+              <div style="font-size:0.9rem; font-weight:800;">27°C</div>
+              <div style="font-size:0.75rem; color:#dc2626;">90% आंधी</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: CROP CALENDAR -->
+      <div id="panel-calendar" class="tab-panel hidden-panel">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h3><i class="fa-solid fa-calendar-days"></i> स्मार्ट फसल कैलेंडर मेकर</h3>
+          </div>
+          
+          <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px; background:#f8fafc; padding:16px; border-radius:12px;">
+            <div style="flex:1; min-width:200px;">
+              <label style="font-weight:700; font-size:0.9rem; display:block; margin-bottom:6px;">फसल का नाम चुनें:</label>
+              <select id="calendarCropSelect" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;" onchange="generateCropCalendar()">
+                <option value="wheat">🌾 गेहूं (Wheat)</option>
+                <option value="mustard">🌿 सरसों (Mustard)</option>
+                <option value="gram">🌱 चना (Gram)</option>
+                <option value="cumin">🌿 जीरा (Cumin)</option>
+                <option value="onion">🧅 प्याज (Onion)</option>
+                <option value="bajra">🌾 बाजरा (Bajra)</option>
+              </select>
+            </div>
+            
+            <div style="flex:1; min-width:200px;">
+              <label style="font-weight:700; font-size:0.9rem; display:block; margin-bottom:6px;">बुआई की तारीख (Sowing Date):</label>
+              <input type="date" id="calendarSowingDate" value="2026-11-15" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;" onchange="generateCropCalendar()">
+            </div>
+
+            <div style="display:flex; align-items:flex-end;">
+              <button class="btn-primary-green" onclick="generateCropCalendar()"><i class="fa-solid fa-wand-magic-sparkles"></i> कैलेंडर बनाएं</button>
+            </div>
+          </div>
+
+          <h4 style="margin-bottom:16px;">🌱 फसल विकास एवं कार्य टाइमलाइन (Dynamic Timeline):</h4>
+          <div id="calendarTimelineOutput" class="task-timeline">
+            <!-- Dynamically populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: AI LEAF DISEASE DOCTOR -->
+      <div id="panel-disease" class="tab-panel hidden-panel">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h3><i class="fa-solid fa-microscope"></i> AI फसल डॉक्टर (Photo Leaf Disease Detector)</h3>
+          </div>
+          
+          <div class="leaf-doctor-container">
+            <div>
+              <div class="upload-dropzone" onclick="document.getElementById('leafImageInput').click()">
+                <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
+                <h4 style="color:var(--primary-deep);">रोगग्रस्त पत्ते की फोटो अपलोड करें या खींचें</h4>
+                <p style="font-size:0.85rem; color:var(--text-muted);">JPEG, PNG फाइल्स सपोर्टेड (Max 5MB)</p>
+                <input type="file" id="leafImageInput" accept="image/*" style="display:none;" onchange="handleLeafUpload(event)">
+              </div>
+
+              <div style="margin-top:18px;">
+                <label style="font-weight:700; font-size:0.85rem; color:var(--text-muted);">या इनमें से एक नमूना चुनें (Try Sample):</label>
+                <div class="sample-leaf-gallery">
+                  <img src="https://images.unsplash.com/photo-1592417817098-8f3d6ef23a28?auto=format&fit=crop&w=200&q=80" title="गेहूं का रतुआ (Rust Disease)" class="sample-leaf-thumb" onclick="analyzeSampleDisease('rust')">
+                  <img src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&w=200&q=80" title="सरसों का मोयला (Aphids Attack)" class="sample-leaf-thumb" onclick="analyzeSampleDisease('aphids')">
+                  <img src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=200&q=80" title="पोषक तत्व की कमी (Nutrient Deficiency)" class="sample-leaf-thumb" onclick="analyzeSampleDisease('nutrient')">
+                </div>
+              </div>
+            </div>
+
+            <div id="diseaseResultBox" class="diagnosis-result-box">
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+                <div style="width:40px; height:40px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <div>
+                  <h4 style="font-size:1.1rem; color:var(--primary-deep);" id="diagName">संभवतः: पीले रतुआ रोग (Yellow Rust) का लक्षण</h4>
+                  <span style="font-size:0.8rem; color:#b45309; font-weight:700;">गंभीरता: मध्यम (Severity: Medium)</span>
+                </div>
+              </div>
+
+              <div style="font-size:0.9rem; line-height:1.6; color:var(--text-main);" id="diagDetails">
+                <p><strong>जैविक उपचार (Organic Solution):</strong> नीम का तेल (Neem Oil 5ml/लीटर पानी) का तुरंत छिड़काव करें।</p>
+                <p style="margin-top:6px;"><strong>रासायनिक उपचार (Chemical Solution):</strong> प्रोपिकोनाज़ोल 25% EC (Propiconazole) 1 ml प्रति लीटर पानी में मिलाकर छिड़कें।</p>
+                <p style="margin-top:6px;"><strong>मात्रा (Dosage):</strong> 1 एकड़ के लिए 200 ml दवा 150 लीटर पानी में घोल बनाकर स्प्रे करें।</p>
+              </div>
+
+              <div class="disclaimer-box">
+                <i class="fa-solid fa-circle-info"></i> <strong>अस्वीकरण:</strong> AI का सुझाव अंतिम कृषि सलाह नहीं है। सटीक उपचार के लिए अपने पास के कृषि विशेषज्ञ (KVK) से संपर्क करें।
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: FARM DIARY -->
+      <div id="panel-diary" class="tab-panel hidden-panel">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h3><i class="fa-solid fa-book-journal-whills"></i> डिजिटल खेत बही-खाता (Farm Expense & Profit Ledger)</h3>
+            <button class="btn-primary-green" onclick="exportDiaryPDF()"><i class="fa-solid fa-file-pdf"></i> PDF डाउनलोड करें</button>
+          </div>
+
+          <div class="ledger-summary-banner">
+            <div class="summary-card spent">
+              <h5>कुल खर्च (Total Spent)</h5>
+              <p id="totalSpentText">₹14,500</p>
+            </div>
+            <div class="summary-card earned">
+              <h5>कुल बिक्री (Total Sales)</h5>
+              <p id="totalEarnedText">₹65,000</p>
+            </div>
+            <div class="summary-card profit">
+              <h5>शुद्ध मुनाफा (Net Profit)</h5>
+              <p id="netProfitText">+₹50,500</p>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 2fr; gap:24px;">
+            <!-- Form -->
+            <form onsubmit="addDiaryEntry(event)" style="background:#f8fafc; padding:20px; border-radius:12px;">
+              <h4 style="margin-bottom:14px;">+ नया लेन-देन जोड़ें</h4>
+              <div style="margin-bottom:12px;">
+                <label style="font-size:0.85rem; font-weight:700;">प्रकार:</label>
+                <select id="diaryType" style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
+                  <option value="expense">खर्च (Expense)</option>
+                  <option value="income">आय / फसल बिक्री (Income)</option>
+                </select>
+              </div>
+              <div style="margin-bottom:12px;">
+                <label style="font-size:0.85rem; font-weight:700;">विवरण (Category):</label>
+                <input type="text" id="diaryDesc" placeholder="उदा: बीज, यूरिया, मजदूरी, डीजल" required style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
+              </div>
+              <div style="margin-bottom:12px;">
+                <label style="font-size:0.85rem; font-weight:700;">राशि (Amount ₹):</label>
+                <input type="number" id="diaryAmount" placeholder="₹ 1500" required style="width:100%; padding:8px; border-radius:6px; border:1px solid #cbd5e1;">
+              </div>
+              <button type="submit" class="btn-primary-green" style="width:100%;">सेव करें</button>
+            </form>
+
+            <!-- Table -->
+            <div class="mandi-table-wrapper">
+              <table class="mandi-table">
+                <thead>
+                  <tr>
+                    <th>तारीख</th>
+                    <th>विवरण</th>
+                    <th>प्रकार</th>
+                    <th>राशि (₹)</th>
+                  </tr>
+                </thead>
+                <tbody id="diaryTableBody">
+                  <tr>
+                    <td>01 Aug 2026</td>
+                    <td>गेहूं बीज (HD 2967) 40 kg</td>
+                    <td><span style="color:#b91c1c;">खर्च</span></td>
+                    <td>₹3,200</td>
+                  </tr>
+                  <tr>
+                    <td>02 Aug 2026</td>
+                    <td>DAP खाद 2 बोरी</td>
+                    <td><span style="color:#b91c1c;">खर्च</span></td>
+                    <td>₹2,700</td>
+                  </tr>
+                  <tr>
+                    <td>03 Aug 2026</td>
+                    <td>ट्रैक्टर जुताई किराया</td>
+                    <td><span style="color:#b91c1c;">खर्च</span></td>
+                    <td>₹1,800</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 6: MANDI PRICES -->
+      <div id="panel-mandi" class="tab-panel hidden-panel">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h3><i class="fa-solid fa-chart-line"></i> लाइव मंडी भाव (Live APMC Mandi Prices)</h3>
+            <button class="btn-primary-green" onclick="loadMandiPrices()"><i class="fa-solid fa-rotate"></i> ताज़ा रेट प्राप्त करें</button>
+          </div>
+          
+          <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap;">
+            <input type="text" id="mandiSearchInput" placeholder="मंडी या फसल का नाम खोजें (उदा. कोटा, गेहूं)" onkeyup="filterMandiTable()" style="padding:10px 16px; border-radius:20px; border:1px solid #cbd5e1; flex:1; min-width:200px;">
+          </div>
+
+          <div class="mandi-table-wrapper">
+            <table class="mandi-table">
+              <thead>
+                <tr>
+                  <th>राज्य/जिला</th>
+                  <th>मंडी का नाम</th>
+                  <th>फसल</th>
+                  <th>न्यूनतम भाव (₹)</th>
+                  <th>अधिकतम भाव (₹)</th>
+                  <th>मॉडल भाव (₹/क्वि)</th>
+                  <th>ट्रेंड</th>
+                </tr>
+              </thead>
+              <tbody id="fullMandiTableBody">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 7: REMINDERS -->
+      <div id="panel-reminders" class="tab-panel hidden-panel">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h3><i class="fa-solid fa-bell"></i> सिंचाई, खाद व स्प्रे टाइमर्स</h3>
+          </div>
+          <div class="task-timeline">
+            <div class="task-item">
+              <div class="task-item-left">
+                <i class="fa-solid fa-droplet text-blue" style="font-size:1.5rem; margin-right:10px;"></i>
+                <div>
+                  <div class="task-title">💧 अगली सिंचाई (Farm 1 - गेहूं)</div>
+                  <div class="task-desc">पिछली सिंचाई: 10 दिन पहले | अगली प्रस्तावित तारीख: 06 अगस्त 2026</div>
+                </div>
+              </div>
+              <button class="btn-primary-green" onclick="alert('सिंचाई रिमाइंडर अपडेट किया गया!')">पूर्ण चिह्नित करें</button>
+            </div>
+
+            <div class="task-item">
+              <div class="task-item-left">
+                <i class="fa-solid fa-vial text-amber" style="font-size:1.5rem; margin-right:10px;"></i>
+                <div>
+                  <div class="task-title">🧪 यूरिया दूसरा डोज़ (Top Dressing)</div>
+                  <div class="task-desc">मात्रा: 45 kg/एकड़ (बारिश थमने के बाद डालें)</div>
+                </div>
+              </div>
+              <button class="btn-primary-green" onclick="alert('खाद रिमाइंडर अपडेट किया गया!')">पूर्ण चिह्नित करें</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 8: GOVT SCHEMES -->
+      <div id="panel-schemes" class="tab-panel hidden-panel">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h3><i class="fa-solid fa-landmark"></i> प्रमुख सरकारी योजनाएं एवं सब्सिडी (Govt Schemes)</h3>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:20px;">
+              <span class="alert-badge-red" style="background:#dcfce7; color:#15803d; border-color:#86efac; margin-bottom:10px; display:inline-block;">₹6,000 / वर्ष</span>
+              <h4 style="font-size:1.2rem; color:var(--primary-deep);">PM किसान सम्मान निधि</h4>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin:8px 0 14px;">हर 4 महीने में ₹2,000 की सीधी किस्त किसान के बैंक खाते में।</p>
+              <a href="https://pmkisan.gov.in" target="_blank" class="btn-primary-green" style="display:inline-block; text-decoration:none; font-size:0.85rem;">आवेदन स्थिति जाँचें &rarr;</a>
+            </div>
+
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:20px;">
+              <span class="alert-badge-red" style="background:#fef3c7; color:#b45309; border-color:#fde68a; margin-bottom:10px; display:inline-block;">60% से 90% सब्सिडी</span>
+              <h4 style="font-size:1.2rem; color:var(--primary-deep);">PM कुसुम योजना (Solar Pump)</h4>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin:8px 0 14px;">खेत में सोलर पंप लगाने पर भारी सरकारी सब्सिडी।</p>
+              <button class="btn-primary-green" style="font-size:0.85rem;" onclick="alert('कुसुम योजना पोर्टल पर पुनर्निर्देशित किया जा रहा है...')">सब्सिडी लागू करें &rarr;</button>
+            </div>
+
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:20px;">
+              <span class="alert-badge-red" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd; margin-bottom:10px; display:inline-block;">फसल सुरक्षा</span>
+              <h4 style="font-size:1.2rem; color:var(--primary-deep);">प्रधानमंत्री फसल बीमा योजना (PMFBY)</h4>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin:8px 0 14px;">ओलावृष्टि, बाढ़ या सूखा से फसल नुकसान का 100% क्लेम।</p>
+              <button class="btn-primary-green" style="font-size:0.85rem;" onclick="alert('बीमा दावा सहायता शुरू की गई!')">क्लेम दर्ज करें &rarr;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       3. FLOATING AI VOICE ASSISTANT DRAWER ("खेती-बाड़ी मित्र")
+       ========================================================================== -->
+  <button class="floating-voice-btn" id="voiceFabBtn" onclick="toggleVoiceDrawer()" title="बोलकर सवाल पूछें">
+    <i class="fa-solid fa-microphone"></i>
+  </button>
+
+  <div id="voiceDrawerModal" class="voice-drawer-modal hidden-panel">
+    <div class="voice-drawer-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <i class="fa-solid fa-robot" style="font-size:1.3rem; color:var(--accent-lime);"></i>
+        <div>
+          <h4 style="font-size:1rem; margin:0;">खेती-बाड़ी AI मित्र</h4>
+          <span style="font-size:0.75rem; color:#b7e4c7;">ऑनलाइन • वॉइस असिस्टेंट</span>
+        </div>
+      </div>
+      <button onclick="toggleVoiceDrawer()" style="background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="voice-drawer-body" id="chatMessageHistory">
+      <div class="chat-bubble bot">
+        राम-राम किसान भाई! 🙏 मैं आपका AI कृषि मित्र हूँ। आप मुझसे मौसम, सिंचाई, खाद, बीमारी या मंडी भाव के बारे में बोलकर या लिखकर सवाल पूछ सकते हैं।
+      </div>
+    </div>
+
+    <div style="padding:0 12px;">
+      <div class="quick-prompts-row">
+        <span class="prompt-chip" onclick="sendQuickPrompt('मेरी सरसों की अगली सिंचाई कब है?')">🌱 सरसों सिंचाई</span>
+        <span class="prompt-chip" onclick="sendQuickPrompt('आज यूरिया डालूँ या नहीं?')">🧪 यूरिया सलाह</span>
+        <span class="prompt-chip" onclick="sendQuickPrompt('गेहूं का मंडी भाव क्या है?')">💰 गेहूं भाव</span>
+      </div>
+    </div>
+
+    <div class="voice-drawer-footer">
+      <input type="text" id="voiceTextInput" class="voice-input-box" placeholder="यहाँ बोलें या लिखें..." onkeypress="handleChatKeyPress(event)">
+      <button class="btn-send-chat" onclick="sendVoiceMessage()">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- App Main Logic Script -->
+  <script src="app.js"></script>
+</body>
+</html>
