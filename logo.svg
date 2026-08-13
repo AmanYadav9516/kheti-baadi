@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f392b"/>
+      <stop offset="50%" stop-color="#1b4332"/>
+      <stop offset="100%" stop-color="#081c15"/>
+    </linearGradient>
+
+    <!-- Gold Accent Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe27a"/>
+      <stop offset="50%" stop-color="#e9c46a"/>
+      <stop offset="100%" stop-color="#d4a373"/>
+    </linearGradient>
+
+    <!-- Lime Glow Gradient -->
+    <linearGradient id="limeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a3e635"/>
+      <stop offset="100%" stop-color="#40916c"/>
+    </linearGradient>
+
+    <!-- Soft Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Outer Rounded Shield Badge -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="url(#bgGrad)" stroke="url(#goldGrad)" stroke-width="6" />
+
+  <!-- Inner Decorative Sun Ray Rings -->
+  <circle cx="256" cy="220" r="150" fill="none" stroke="rgba(233, 196, 106, 0.15)" stroke-width="3" stroke-dasharray="8 6" />
+  <circle cx="256" cy="220" r="170" fill="none" stroke="rgba(112, 224, 0, 0.12)" stroke-width="2" />
+
+  <!-- Rising Sun Behind Fields -->
+  <path d="M 156 240 A 100 100 0 0 1 356 240 Z" fill="url(#goldGrad)" opacity="0.35" />
+
+  <!-- Fertile Layered Soil Hills (Sketch Arcs) -->
+  <path d="M 40 360 Q 150 310 256 340 Q 360 370 472 330 L 472 440 A 80 80 0 0 1 432 480 L 80 480 A 80 80 0 0 1 40 400 Z" fill="#143628" />
+  <path d="M 40 380 Q 160 340 270 365 Q 380 390 472 355 L 472 480 L 40 480 Z" fill="#0b241b" opacity="0.8" />
+
+  <!-- Hand-Drawn Style Kisan Silhouette / Sketch (Turban Farmer) -->
+  <!-- Farmer Body & Kurta -->
+  <path d="M 190 350 C 190 310, 210 290, 256 290 C 302 290, 322 310, 322 350 L 335 410 L 177 410 Z" fill="#ffffff" opacity="0.9" />
+  <path d="M 230 290 L 256 335 L 282 290 Z" fill="#e9c46a" opacity="0.8" /> <!-- Kurta Collar -->
+
+  <!-- Farmer Head & Facial Line Sketch -->
+  <path d="M 232 245 Q 256 230 280 245 Q 275 285 256 288 Q 237 285 232 245 Z" fill="#fef0d9" />
+  
+  <!-- Traditional Indian Turban (पगड़ी / Safa Sketch) -->
+  <path d="M 220 242 Q 256 200 292 242 Q 298 225 282 215 Q 256 205 230 215 Q 214 225 220 242 Z" fill="url(#goldGrad)" />
+  <path d="M 226 235 Q 256 215 286 235" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round" />
+  <path d="M 222 248 Q 256 228 290 248" fill="none" stroke="#d97706" stroke-width="3" stroke-linecap="round" />
+  <!-- Turban Fan / Kalgi Twist -->
+  <path d="M 250 210 C 240 185, 272 185, 262 210 Z" fill="#f4a261" />
+
+  <!-- Ears of Wheat Framing Left & Right (गेहूं की बालियां Sketch) -->
+  <!-- Left Wheat Stalk -->
+  <g stroke="url(#goldGrad)" stroke-width="3" fill="url(#goldGrad)">
+    <path d="M 120 340 Q 140 240 170 170" fill="none" stroke-width="4" stroke-linecap="round" />
+    <!-- Wheat Grains Left -->
+    <path d="M 165 165 Q 145 155 150 175 Z" />
+    <path d="M 172 168 Q 192 160 182 180 Z" />
+    <path d="M 158 190 Q 135 180 142 200 Z" />
+    <path d="M 166 195 Q 188 185 178 208 Z" />
+    <path d="M 148 220 Q 125 210 132 230 Z" />
+    <path d="M 158 225 Q 180 215 170 238 Z" />
+  </g>
+
+  <!-- Right Wheat Stalk -->
+  <g stroke="url(#goldGrad)" stroke-width="3" fill="url(#goldGrad)">
+    <path d="M 392 340 Q 372 240 342 170" fill="none" stroke-width="4" stroke-linecap="round" />
+    <!-- Wheat Grains Right -->
+    <path d="M 347 165 Q 367 155 362 175 Z" />
+    <path d="M 340 168 Q 320 160 330 180 Z" />
+    <path d="M 354 190 Q 377 180 370 200 Z" />
+    <path d="M 346 195 Q 324 185 334 208 Z" />
+    <path d="M 364 220 Q 387 210 380 230 Z" />
+    <path d="M 354 225 Q 332 215 342 238 Z" />
+  </g>
+
+  <!-- Elegant Hindi & English Brand Typography Banner -->
+  <g filter="url(#glow)">
+    <!-- Hindi Brand Name -->
+    <text x="256" y="435" text-anchor="middle" font-family="'Noto Sans Devanagari', 'Outfit', sans-serif" font-weight="900" font-size="44" fill="#ffffff" letter-spacing="1">
+      खेती-बाड़ी
+    </text>
+    <!-- English Subtitle -->
+    <text x="256" y="465" text-anchor="middle" font-family="'Outfit', sans-serif" font-weight="700" font-size="18" fill="#e9c46a" letter-spacing="3">
+      KHETI-BAADI • FARMER ASSISTANT
+    </text>
+  </g>
+
+  <!-- Star Embellishments -->
+  <path d="M 110 435 L 114 445 L 125 445 L 116 451 L 119 461 L 110 455 L 101 461 L 104 451 L 95 445 L 106 445 Z" fill="#e9c46a" />
+  <path d="M 402 435 L 406 445 L 417 445 L 408 451 L 411 461 L 402 455 L 393 461 L 396 451 L 387 445 L 398 445 Z" fill="#e9c46a" />
+</svg>
